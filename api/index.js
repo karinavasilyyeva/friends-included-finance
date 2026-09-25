@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       if (process.env.TELEGRAM_WEBHOOK_SECRET && req.headers['x-telegram-bot-api-secret-token'] !== process.env.TELEGRAM_WEBHOOK_SECRET) return json(res, 403, { error: 'Invalid webhook secret' });
       const update = await body(req), message = update.message; if (!message?.text) return json(res, 200, { ok: true });
       const employee = await store.employeeByTelegramId(message.from.id);
-      if (!employee) { await sendTelegram(message.chat.id, 'Your Telegram account is not linked. Ask Svetlana to link your Telegram user ID.'); return json(res, 200, { ok: true }); }
+      if (!employee) { await sendTelegram(message.chat.id, `Your Telegram account is not linked. Your Telegram user ID is ${message.from.id}. Ask Svetlana to link this ID.`); return json(res, 200, { ok: true }); }
       try {
         const parsed = parseTelegram(message.text), origin = { kind: 'telegram', chatId: String(message.chat.id) };
         const row = parsed.type === 'sale' ? createSale(parsed.value, employee, origin) : createExpense(parsed.value, employee, origin);
